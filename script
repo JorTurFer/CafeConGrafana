@@ -1,0 +1,11 @@
+helm install k6-test \
+		chart	\
+		-n load-tests \
+		--create-namespace \
+		--set test.file=test/demo.js \
+		--set test.maxVu=400 \
+		--set repo.url=github.com/JorTurFer/CafeConGrafana \
+		--set repo.branch=main \
+		--set test.extraConfig.K6_PROMETHEUS_RW_SERVER_URL=http://prometheus-server.prometheus/api/v1/write \
+		--set test.extraConfig.K6_PROMETHEUS_RW_TREND_AS_NATIVE_HISTOGRAM=true \
+		--set test.extraArgs="--out cloud --out experimental-prometheus-rw --tag testCase=demoCase" 

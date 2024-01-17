@@ -1,0 +1,57 @@
+apiVersion: k6.io/v1alpha1
+kind: TestRun
+metadata:
+  name: {{ .Release.Name }}
+spec:
+  {{- if .Values.test.parallelism }}
+  parallelism: {{ .Values.test.parallelism }}
+  {{  else }}
+  {{- /*
+  We have estimated 100 VU per core. As we are using 2CPU machines
+  with a runner per node, given VUs has to be split between 200
+  */}}  
+  parallelism: {{ ceil (divf (.Values.test.maxVus | default 1)  200) }}
+  {{- end }}
+  script:
+    localFile: /repo/{{ .Values.test.file }}
+  arguments: {{ include "arguments" . }}
+  runner:
+    image: {{ .Values.runner.image }}
+    serviceAccountName: {{ .Release.Name }}-k6-runner
+    volumes:
+      - name: git-repo
+        emptyDir: {}
+    volumeMounts:
+      - name: git-repo
+        mountPath: /repo
+    resources:
+      requests:
+        {{- /*
+        As we are using 2CPU machines, this request ensure pod per node
+        */}}  
+        cpu: 1100m
+    initContainers:
+    - name: repo-puller
+      image: bitnami/git
+      command:
+        - "git"
+        - "clone"
+        - "-b"
+        - "{{ .Values.repo.branch }}"
+        - "https://{{ .Values.repo.url }}"
+        - "/repo"
+        - "--depth"
+        - "1"
+      volumeMounts:
+        - name: git-repo
+          mountPath: /repo
+    envFrom:
+      - configMapRef:
+          name: {{ .Release.Name }}-extra-cm
+    tolerations:
+      - effect: NoSchedule
+        key: kind
+        operator: Equal
+        value: k6
+    nodeSelector:
+      agentpool: k6

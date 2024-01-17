@@ -1,0 +1,13 @@
+test:
+  file: ""
+  config: ""
+  extraConfig: {}
+  extraArgs: ""
+
+runner:
+  image: ghcr.io/kedacore/keda-k6-runner
+
+repo:
+  url: ""
+  token: ""
+  branch: main
