@@ -1,3 +1,8 @@
+- https://github.com/grafana/k6-operator#deployment-with-helm
+
+
 - https://github.com/kedacore/keda-performance
 - https://github.com/kedacore/keda-performance/blob/main/.github/workflows/execute-performance.yaml
 - https://github.com/kedacore/keda-performance/tree/main/chart
+
+- https://github.com/kedacore/test-tools/blob/main/k6-runner/Dockerfile
